@@ -8,11 +8,11 @@ When using a CLI based integration a Terraform backend is declared in code like-
 Here, workflows/actions ignore backend declarations and explicitly target new/existing workspaces hosted via SaaS or Enterprise license. Additionally, if you already are using an OSS backend (such as Amazon S3) and you inject this repositories workflows into your cicd - you should expect duplication exceptions during deployment as Terraform Enterprise/Cloud is not going to have awareness of your pre-existing state file(s). 
 
 ## Introduction
-By using GitHub Actions we can automate the deployment of infrastructure during standard Git Operations. Written here are actions, and scripts that enable engineers and developers to plan or apply Infrastructure-as-Code without the burden of maintaining cloud or enterprise workspaces manually; this repository helps minimal overhead (which holistically vastly outweighs the heap of manual configuration required to enable similar functionality while simultaniously ensuring consistent execution).
+By using GitHub Actions we can automate the deployment of infrastructure during standard Git Operations. Written here are actions, and scripts that enable engineers and developers to plan or apply Infrastructure-as-Code without the burden of maintaining cloud or enterprise workspaces manually; this repository helps minimize overhead (which holistically vastly outweighs the heap of manual configuration required to enable similar functionality while simultaniously ensuring consistent execution).
 
 ## Available Actions
 ### [Terraform Plan](./terraform-plan)
-The ```noah-eldreth/terraform-integrations/terraform-plan``` action abstracts many traditionally manual tasks: workspace maintainence, promoting appropriate env/terraform variables, CLI version updates, configuring source control, etc. 
+This action abstracts many traditionally manual tasks: workspace maintainence, promoting appropriate env/terraform variables, CLI version updates, configuring source control, etc. 
 Any new or existing workspaces can be engineered exactly to spec prior to performing a speculative run. Additionally, workspaces can be associated to specific projects and assigned to agent pools automatically. 
 
 Speculative runs can be configured with a suitable range of customization options, and all output is reflected back into GitHub via summaries and Pull Request comments. This includes: 
@@ -76,7 +76,7 @@ jobs:
 ```
 
 ### [Terraform Apply](./terraform-apply)
-The ```noah-eldreth/terraform-integrations/terraform-apply``` action will perform identical logic to the above ```terraform-plan``` action, however as implied it will deploy speculated changes. In the event of non-terminating failures (such as 
+This action will perform identical logic to ```terraform-plan``` action, and in addition to this it will deploy speculated changes. In the event of non-terminating failures (such as 
 failed sentinel policy checks) runs will be discarded so as to prevent blocking subsequent applies.
 
 ### Example Usage
@@ -135,7 +135,7 @@ jobs:
 ```
 
 ## Authors
-#### Code Managed/Owned By: [Noah Eldreth](mailto:noaheldreth12@gmail.com)
+#### Code Managed By: [Noah Eldreth](mailto:noaheldreth12@gmail.com)
 All workflows/actions etc. are written and maintained by amazing contributors found [here](https://github.com/noah-eldreth/terraform-integrations/graphs/contributors).
 
 ## Contributors
