@@ -8,7 +8,7 @@ When using a CLI based integration a Terraform backend is declared in code like-
 Here, workflows/actions ignore backend declarations and explicitly target new/existing workspaces hosted via SaaS or Enterprise license. Additionally, if you already are using an OSS backend (such as Amazon S3) and you inject this repositories workflows into your cicd - you should expect duplication exceptions during deployment as Terraform Enterprise/Cloud is not going to have awareness of your pre-existing state file(s). 
 
 ## Introduction
-By using GitHub Actions we can automate the deployment of infrastructure during standard Git Operations. Written here are actions, and scripts that enable engineers and developers to plan or apply Infrastructure-as-Code without the burden of maintaining cloud or enterprise workspaces manually; this repository helps minimal overhead (which holistically vastly outweighs the heap of manual configuration required to enable similar functionality while simultaniously ensuring consistent execution).
+By using GitHub Actions we can automate the deployment of infrastructure during standard Git Operations. Written here are actions, and scripts that enable engineers and developers to plan or apply Infrastructure-as-Code without the burden of maintaining cloud or enterprise workspaces manually; this repository helps minimize overhead (which holistically vastly outweighs the heap of manual configuration required to enable similar functionality while simultaniously ensuring consistent execution).
 
 ## Available Actions
 ### [Terraform Plan](./terraform-plan)
