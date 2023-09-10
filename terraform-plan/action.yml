@@ -1,0 +1,87 @@
+name: terraform-plan
+description: Execute Terraform Plan against Terraform Enterprise/Cloud Workspace.
+inputs:
+  hostname:
+    description: Terraform Enterprise/Cloud target hostname. Can instead be set via 'TF_CLOUD_HOSTNAME' environment variable. Will default to Terraform Cloud hostname 'app.terraform.io'.
+    required: false
+  organization: 
+    description: Target Terraform Organization. Can instead be set via 'TF_CLOUD_ORGANIZATION' environment variable.
+    required: false
+  workspace: 
+    description: Name of target Workspace. Can instead be set via 'TF_WORKSPACE' environment variable.
+    required: false
+  project: 
+    description: Name of target Project which will manage Workspace. Can instead be set via 'TF_PROJECT' environment variable. Will default to Terraform Cloud hostname 'Default Project'.
+    required: false
+  execution_mode:
+    description: Workspace execution-mode; remote or agent. (Remote execution will use HashiCorp managed runner to perform run. Agent will instead use a self-hosted runner.)
+    required: false
+  working_directory: 
+    description: Relative directory to applicable *.tf files. Will default to root directory of repository.
+    required: false
+  terraform_version: 
+    description: Terraform CLI version to use during run execution. Defaults to 'latest'.
+    required: false
+  var_file:
+    description: Relative path to *.tfvar(.json) files to load run-specific variables.
+    required: false
+  variables:
+    description: List of variables to push to target workspace. May be written in JSON or HCL.
+    required: false
+  environment_variables:
+    description: List of environment variables to push to target workspace. May be written in JSON or HCL.
+    required: false
+  message:
+    description: Message to write to explain trigger for Terraform run. Will Default to 'Created by GitHub Actions CI'.
+    required: false
+  label:
+    description: Header/Label for Pull Request Comment. Will also be used to identify existing Comment.
+    required: false
+outputs:
+  status:
+    description: "The result of the operation. Possible values are `Success`, `Error` or `Timeout`"
+  configuration_version_id:
+    description: "The Configuration Version ID that was created."
+  configuration_version_status:
+    description: "Current status of the created configuration version."
+  run_id:
+    description: "The ID of the created run."
+  run_status:
+    description: "The current status of the Terraform Cloud run."
+  run_message:
+    description: "The message attribute of the shown run."
+  run_link:
+    description: "Link to view the run in Terraform Cloud."
+  plan_id:
+    description: "The ID of the plan, associated to the created run."
+  plan_status:
+    description: "The plan status for the associated run."
+  cost_estimation_id:
+    description: "The ID of the cost estimation for the associated run. (If cost estimation is enabled)"
+  cost_estimation_status:
+    description: "The cost estimation status for the associated run. (If cost estimation is enabled)"
+  workspace_id:
+    description: "The ID of the Terraform workspace, associated to the created run."
+  project_id:
+    description: "The ID of the Terraform project that owns targeted workspace."
+  changes:
+    description: "True if any imports, additions, updates, or destructions are denoted in plan; otherwise False."
+  resource_count:
+    description: "The number of resources managed by target workspace."
+  resource_imports:
+    description: "Speculated number of resources to be imported by configuration."
+  resource_additions: 
+    description: "Speculated number of resources to be created by configuration."
+  resource_changes:
+    description: "Speculated number of resources to be updated by configuration."
+  resource_destructions:
+    description: "Speculated number of resources to be destroyed by configuration."
+
+runs:
+  using: docker
+  image: ../image/Dockerfile
+  entrypoint: /entrypoints/terraform-plan.sh
+
+branding:
+  icon: globe
+  color: purple

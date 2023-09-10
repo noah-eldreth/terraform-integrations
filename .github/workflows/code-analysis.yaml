@@ -1,0 +1,68 @@
+name: Code Analysis
+
+# Criteria for Execution
+on:
+  workflow_dispatch
+  # pull_request:
+  #   paths:
+  #   - 'image/**'
+  #   - 'authentication/**'
+
+# Required Permissions by GITHUB_TOKEN
+permissions: write-all
+
+env:
+  PRE_COMMIT_COLOR: "always"
+
+jobs:
+  # Run Terraform hooks to validate configurations via minimum specified version of Terraform
+  pre-commit:
+    name: pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v4.6.0
+        with:
+          python-version: "3.10"
+
+      - name: Install Packages (pip)
+        run: pip install pre-commit pylint
+
+      # Checkout code on remote GitHub runner
+      - name: Checkout Configuration
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Execute Pre-Commit Hook Evaluations
+        shell: bash
+        run: |
+          #!/bin/bash
+          EXIT_CODE=0
+          PRE_COMMIT_STDOUT_PATH="pre-commit-output.stdout"
+          pre-commit run --all-files --show-diff-on-failure \
+          | tee $PRE_COMMIT_STDOUT_PATH || EXIT_CODE=$?
+          echo """#### Terraform CI Operations Summary
+          #### Pre-Commit Execution Status Code: \`$EXIT_CODE\`
+
+          <details><summary>Execution Summary</summary>
+
+          \`\`\`shell-session      
+          $(cat $PRE_COMMIT_STDOUT_PATH)
+          \`\`\`
+
+          </details>""" >> $GITHUB_STEP_SUMMARY
+          exit $EXIT_CODE
+
+      # Commit pre-commit hook(s)' changes to referral branch
+      - name: Update Source Branch
+        if: always()
+        shell: bash
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m 'Auto Commit By GitHub Actions' -a || echo 'Nothing to update'
+          remote_repo="https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${{github.event.pull_request.head.repo.full_name}}.git"
+          git push "${remote_repo}" HEAD:${{ github.event.pull_request.head.ref }} || true
