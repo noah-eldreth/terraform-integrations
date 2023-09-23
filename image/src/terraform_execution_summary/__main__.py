@@ -430,162 +430,163 @@ Resource actions are indicated with the following symbols:
 
 Terraform will perform the following actions:
 """
-    for resource_change in resources["resource_changes"]:
-        if not "no-op" in resource_change["change"]["actions"]:
-            before_sensitive = {}
-            if "before_sensitive" in resource_change["change"]:
-                if type(resource_change["change"]["before_sensitive"]) is dict:
-                    before_sensitive = resource_change["change"]["before_sensitive"]
+    if "resource_changes" in resources:
+        for resource_change in resources["resource_changes"]:
+            if not "no-op" in resource_change["change"]["actions"]:
+                before_sensitive = {}
+                if "before_sensitive" in resource_change["change"]:
+                    if type(resource_change["change"]["before_sensitive"]) is dict:
+                        before_sensitive = resource_change["change"]["before_sensitive"]
 
-            after_sensitive = {}
-            if "after_sensitive" in resource_change["change"]:
-                if type(resource_change["change"]["after_sensitive"]) is dict:
-                    after_sensitive = resource_change["change"]["after_sensitive"]
+                after_sensitive = {}
+                if "after_sensitive" in resource_change["change"]:
+                    if type(resource_change["change"]["after_sensitive"]) is dict:
+                        after_sensitive = resource_change["change"]["after_sensitive"]
 
-            after_unknown = {}
-            if "after_unknown" in resource_change["change"]:
-                if type(resource_change["change"]["after_unknown"]) is dict:
-                    after_unknown = resource_change["change"]["after_unknown"]
+                after_unknown = {}
+                if "after_unknown" in resource_change["change"]:
+                    if type(resource_change["change"]["after_unknown"]) is dict:
+                        after_unknown = resource_change["change"]["after_unknown"]
 
-            replace_paths = []
-            if "replace_paths" in resource_change["change"]:
-                if type(resource_change["change"]["replace_paths"]) is list:
-                    if resource_change["change"]["replace_paths"]:
-                        replace_paths = resource_change["change"]["replace_paths"][0]
+                replace_paths = []
+                if "replace_paths" in resource_change["change"]:
+                    if type(resource_change["change"]["replace_paths"]) is list:
+                        if resource_change["change"]["replace_paths"]:
+                            replace_paths = resource_change["change"]["replace_paths"][0]
 
-            # Action: CREATE/DESTROY
-            if (
-                "create" in resource_change["change"]["actions"]
-                and "delete" in resource_change["change"]["actions"]
-            ):
-                result += (
-                    RESOURCE_MESSAGE.format(
-                        resource_change["provider_name"],
-                        resource_change["type"],
-                        resource_change["address"],
-                        "This resource must be replaced.",
-                        "/".join(
-                            [
-                                PARSING_LIBRARY["add"]["symbol"],
-                                PARSING_LIBRARY["delete"]["symbol"],
-                            ]
-                        ),
-                        " ".join(
-                            [
-                                "resource",
-                                f'"{resource_change["type"]}"',
-                                f'"{resource_change["name"]}"',
-                            ]
-                        ),
+                # Action: CREATE/DESTROY
+                if (
+                    "create" in resource_change["change"]["actions"]
+                    and "delete" in resource_change["change"]["actions"]
+                ):
+                    result += (
+                        RESOURCE_MESSAGE.format(
+                            resource_change["provider_name"],
+                            resource_change["type"],
+                            resource_change["address"],
+                            "This resource must be replaced.",
+                            "/".join(
+                                [
+                                    PARSING_LIBRARY["add"]["symbol"],
+                                    PARSING_LIBRARY["delete"]["symbol"],
+                                ]
+                            ),
+                            " ".join(
+                                [
+                                    "resource",
+                                    f'"{resource_change["type"]}"',
+                                    f'"{resource_change["name"]}"',
+                                ]
+                            ),
+                        )
+                        + "{\n"
                     )
-                    + "{\n"
-                )
-                result += compare_values(
-                    resource_change["change"]["before"],
-                    resource_change["change"]["after"],
-                    before_sensitive,
-                    after_sensitive,
-                    after_unknown,
-                    replace_paths,
-                )
-                result += "}\n"
-
-            # Action: CREATE
-            elif (
-                "create" in resource_change["change"]["actions"]
-                and "delete" not in resource_change["change"]["actions"]
-            ):
-                result += (
-                    RESOURCE_MESSAGE.format(
-                        resource_change["provider_name"],
-                        resource_change["type"],
-                        resource_change["address"],
-                        PARSING_LIBRARY["add"]["message"],
-                        PARSING_LIBRARY["add"]["symbol"],
-                        " ".join(
-                            [
-                                "resource",
-                                f'"{resource_change["type"]}"',
-                                f'"{resource_change["name"]}"',
-                            ]
-                        ),
+                    result += compare_values(
+                        resource_change["change"]["before"],
+                        resource_change["change"]["after"],
+                        before_sensitive,
+                        after_sensitive,
+                        after_unknown,
+                        replace_paths,
                     )
-                    + "{\n"
-                )
-                result += compare_values(
-                    resource_change["change"]["before"],
-                    resource_change["change"]["after"],
-                    before_sensitive,
-                    after_sensitive,
-                    after_unknown,
-                )
-                result += "}\n"
+                    result += "}\n"
 
-            # Action: DESTROY
-            elif (
-                "delete" in resource_change["change"]["actions"]
-                and "create" not in resource_change["change"]["actions"]
-            ):
-                result += (
-                    RESOURCE_MESSAGE.format(
-                        resource_change["provider_name"],
-                        resource_change["type"],
-                        resource_change["address"],
-                        PARSING_LIBRARY["delete"]["message"],
-                        PARSING_LIBRARY["delete"]["symbol"],
-                        " ".join(
-                            [
-                                "resource",
-                                f'"{resource_change["type"]}"',
-                                f'"{resource_change["name"]}"',
-                            ]
-                        ),
+                # Action: CREATE
+                elif (
+                    "create" in resource_change["change"]["actions"]
+                    and "delete" not in resource_change["change"]["actions"]
+                ):
+                    result += (
+                        RESOURCE_MESSAGE.format(
+                            resource_change["provider_name"],
+                            resource_change["type"],
+                            resource_change["address"],
+                            PARSING_LIBRARY["add"]["message"],
+                            PARSING_LIBRARY["add"]["symbol"],
+                            " ".join(
+                                [
+                                    "resource",
+                                    f'"{resource_change["type"]}"',
+                                    f'"{resource_change["name"]}"',
+                                ]
+                            ),
+                        )
+                        + "{\n"
                     )
-                    + "{\n"
-                )
-                result += compare_values(
-                    resource_change["change"]["before"],
-                    resource_change["change"]["after"],
-                    before_sensitive,
-                    after_sensitive,
-                    after_unknown,
-                )
-                result += "}\n"
+                    result += compare_values(
+                        resource_change["change"]["before"],
+                        resource_change["change"]["after"],
+                        before_sensitive,
+                        after_sensitive,
+                        after_unknown,
+                    )
+                    result += "}\n"
 
-            # Action: UPDATE
-            elif "update" in resource_change["change"]["actions"]:
-                result += (
-                    RESOURCE_MESSAGE.format(
-                        resource_change["provider_name"],
-                        resource_change["type"],
-                        resource_change["address"],
-                        PARSING_LIBRARY["update"]["message"],
-                        PARSING_LIBRARY["update"]["symbol"],
-                        " ".join(
-                            [
-                                "resource",
-                                f'"{resource_change["type"]}"',
-                                f'"{resource_change["name"]}"',
-                            ]
-                        ),
+                # Action: DESTROY
+                elif (
+                    "delete" in resource_change["change"]["actions"]
+                    and "create" not in resource_change["change"]["actions"]
+                ):
+                    result += (
+                        RESOURCE_MESSAGE.format(
+                            resource_change["provider_name"],
+                            resource_change["type"],
+                            resource_change["address"],
+                            PARSING_LIBRARY["delete"]["message"],
+                            PARSING_LIBRARY["delete"]["symbol"],
+                            " ".join(
+                                [
+                                    "resource",
+                                    f'"{resource_change["type"]}"',
+                                    f'"{resource_change["name"]}"',
+                                ]
+                            ),
+                        )
+                        + "{\n"
                     )
-                    + "{\n"
-                )
-                result += compare_values(
-                    resource_change["change"]["before"],
-                    resource_change["change"]["after"],
-                    before_sensitive,
-                    after_sensitive,
-                    after_unknown,
-                )
-                result += "}\n"
-            elif "read" in resource_change["change"]["actions"]:
-                debug(f"Data resource found [{resource_change['address']}]")
-            else:
-                error(
-                    f"Failed to parse plan action on resource [{resource_change['address']}]"
-                )
-                sys.exit(1)
+                    result += compare_values(
+                        resource_change["change"]["before"],
+                        resource_change["change"]["after"],
+                        before_sensitive,
+                        after_sensitive,
+                        after_unknown,
+                    )
+                    result += "}\n"
+
+                # Action: UPDATE
+                elif "update" in resource_change["change"]["actions"]:
+                    result += (
+                        RESOURCE_MESSAGE.format(
+                            resource_change["provider_name"],
+                            resource_change["type"],
+                            resource_change["address"],
+                            PARSING_LIBRARY["update"]["message"],
+                            PARSING_LIBRARY["update"]["symbol"],
+                            " ".join(
+                                [
+                                    "resource",
+                                    f'"{resource_change["type"]}"',
+                                    f'"{resource_change["name"]}"',
+                                ]
+                            ),
+                        )
+                        + "{\n"
+                    )
+                    result += compare_values(
+                        resource_change["change"]["before"],
+                        resource_change["change"]["after"],
+                        before_sensitive,
+                        after_sensitive,
+                        after_unknown,
+                    )
+                    result += "}\n"
+                elif "read" in resource_change["change"]["actions"]:
+                    debug(f"Data resource found [{resource_change['address']}]")
+                else:
+                    error(
+                        f"Failed to parse plan action on resource [{resource_change['address']}]"
+                    )
+                    sys.exit(1)
     result += "\n"
 
     return result.lstrip()
